@@ -96,7 +96,7 @@ function bound_taylor1(fT::Taylor1, I::Interval)
     # Compute roots of the derivative using the second derivative
     # Fix some sort of relative tolerance for Newton root search
     fTd2 = TaylorSeries.derivative(fTd)
-    rootsder = roots(fTd, fTd2, I, Newton, 1.0e-5*mag(I))
+    rootsder = roots(x->fTd(x), x->fTd2(x), I, Newton, 1.0e-5*mag(I))
 
     # Bound the range of fT using the roots and end points
     num_roots = length(rootsder)
@@ -137,3 +137,13 @@ function bound_taylor1(fT::Taylor1{Interval{T}}, fTd::Taylor1{Interval{T}},
     end
     return fT(I)
 end
+
+"""
+    bound_taylor1(fT::TaylorModel1, I=domain(fT)::Interval)
+
+Compute a *tight* polynomial bound for the Taylor model `fT`
+in the interval `I`, considering whether its derivative `ftd` has
+a definite sign.
+
+"""
+bound_taylor1(fT::TaylorModel1, I=domain(fT)::Interval) = bound_taylor1(polynomial(fT), I)
